@@ -1,0 +1,105 @@
+{
+  "text": "Explore Kyoto through a visual guide. Choose a direction for a more detailed plan.",
+  "title": "Explore Kyoto",
+  "messages": [
+    {
+      "version": "v0.9.1",
+      "createSurface": {
+        "surfaceId": "kyoto",
+        "catalogId": "urn:a2ui-zero:catalog:1"
+      }
+    },
+    {
+      "version": "v0.9.1",
+      "updateComponents": {
+        "surfaceId": "kyoto",
+        "components": [
+          {
+            "id": "root",
+            "component": "Column",
+            "children": [
+              "photo",
+              "heading",
+              "intro",
+              "choices",
+              "source"
+            ]
+          },
+          {
+            "id": "photo",
+            "component": "Image",
+            "url": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=960&auto=format&fit=crop",
+            "alt": "Kyoto street and traditional architecture",
+            "caption": "Photograph served by Unsplash"
+          },
+          {
+            "id": "heading",
+            "component": "Text",
+            "text": "A day in Kyoto",
+            "variant": "h2"
+          },
+          {
+            "id": "intro",
+            "component": "Text",
+            "text": "Build a day around the things you enjoy. Choose a direction to start planning.",
+            "variant": "body"
+          },
+          {
+            "id": "choices",
+            "component": "Row",
+            "children": [
+              "culture",
+              "food"
+            ]
+          },
+          {
+            "id": "culture",
+            "component": "Button",
+            "child": "culture_label",
+            "variant": "primary",
+            "action": {
+              "event": {
+                "name": "user_message",
+                "context": {
+                  "message": "Help me plan a Kyoto day around temples and gardens."
+                }
+              }
+            }
+          },
+          {
+            "id": "culture_label",
+            "component": "Text",
+            "text": "Temples and gardens",
+            "variant": "body"
+          },
+          {
+            "id": "food",
+            "component": "Button",
+            "child": "food_label",
+            "variant": "primary",
+            "action": {
+              "event": {
+                "name": "user_message",
+                "context": {
+                  "message": "Help me plan a Kyoto day around food and neighborhoods."
+                }
+              }
+            }
+          },
+          {
+            "id": "food_label",
+            "component": "Text",
+            "text": "Food and neighborhoods",
+            "variant": "body"
+          },
+          {
+            "id": "source",
+            "component": "Link",
+            "text": "Kyoto official travel guide",
+            "url": "https://kyoto.travel/"
+          }
+        ]
+      }
+    }
+  ]
+}

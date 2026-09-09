@@ -1,0 +1,945 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:a2ui-zero:catalog:1",
+  "catalogId": "urn:a2ui-zero:catalog:1",
+  "title": "a2ui-zero catalog",
+  "$defs": {
+    "Row": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Row"
+        },
+        "children": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ChildList"
+            },
+            {
+              "type": "array",
+              "maxItems": 160,
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "common_types.json#/$defs/ComponentId"
+                  },
+                  {
+                    "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "align": {
+          "enum": [
+            "start",
+            "center",
+            "end",
+            "stretch"
+          ]
+        },
+        "justify": {
+          "enum": [
+            "start",
+            "center",
+            "end",
+            "spaceBetween",
+            "spaceAround"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "children"
+      ],
+      "additionalProperties": false
+    },
+    "Column": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Column"
+        },
+        "children": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ChildList"
+            },
+            {
+              "type": "array",
+              "maxItems": 160,
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "common_types.json#/$defs/ComponentId"
+                  },
+                  {
+                    "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "align": {
+          "enum": [
+            "start",
+            "center",
+            "end",
+            "stretch"
+          ]
+        },
+        "justify": {
+          "enum": [
+            "start",
+            "center",
+            "end",
+            "spaceBetween",
+            "spaceAround"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "children"
+      ],
+      "additionalProperties": false
+    },
+    "List": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "List"
+        },
+        "children": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ChildList"
+            },
+            {
+              "type": "array",
+              "maxItems": 160,
+              "items": {
+                "allOf": [
+                  {
+                    "$ref": "common_types.json#/$defs/ComponentId"
+                  },
+                  {
+                    "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "align": {
+          "enum": [
+            "start",
+            "center",
+            "end",
+            "stretch"
+          ]
+        },
+        "justify": {
+          "enum": [
+            "start",
+            "center",
+            "end",
+            "spaceBetween",
+            "spaceAround"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "children"
+      ],
+      "additionalProperties": false
+    },
+    "Text": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Text"
+        },
+        "text": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "common_types.json#/$defs/DataBinding"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "pattern": "^/",
+                      "maxLength": 256
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          ]
+        },
+        "variant": {
+          "enum": [
+            "h1",
+            "h2",
+            "h3",
+            "body",
+            "caption"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "Image": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Image"
+        },
+        "url": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "common_types.json#/$defs/DataBinding"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "pattern": "^/",
+                      "maxLength": 256
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          ]
+        },
+        "alt": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "fit": {
+          "enum": [
+            "cover",
+            "contain"
+          ]
+        },
+        "caption": {
+          "type": "string",
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "url",
+        "alt"
+      ],
+      "additionalProperties": false
+    },
+    "Icon": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Icon"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,63}$"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "Card": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Card"
+        },
+        "child": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "child"
+      ],
+      "additionalProperties": false
+    },
+    "Divider": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Divider"
+        }
+      },
+      "required": [
+        "id",
+        "component"
+      ],
+      "additionalProperties": false
+    },
+    "Link": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Link"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "url": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "common_types.json#/$defs/DataBinding"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "pattern": "^/",
+                      "maxLength": 256
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "text",
+        "url"
+      ],
+      "additionalProperties": false
+    },
+    "Button": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Button"
+        },
+        "child": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "action": {
+          "type": "object",
+          "required": [
+            "event"
+          ],
+          "properties": {
+            "event": {
+              "type": "object",
+              "required": [
+                "name",
+                "context"
+              ],
+              "properties": {
+                "name": {
+                  "const": "user_message"
+                },
+                "context": {
+                  "type": "object",
+                  "required": [
+                    "message"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2000
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "variant": {
+          "enum": [
+            "primary",
+            "borderless",
+            "secondary"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "child",
+        "action"
+      ],
+      "additionalProperties": false
+    },
+    "TextField": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "TextField"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "value": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/DataBinding"
+            },
+            {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "pattern": "^/",
+                  "maxLength": 256
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "variant": {
+          "enum": [
+            "shortText",
+            "longText",
+            "number"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "label",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "CheckBox": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "CheckBox"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "value": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/DataBinding"
+            },
+            {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "pattern": "^/",
+                  "maxLength": 256
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "label",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "ChoicePicker": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "ChoicePicker"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "value": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/DataBinding"
+            },
+            {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "pattern": "^/",
+                  "maxLength": 256
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "variant": {
+          "enum": [
+            "mutuallyExclusive",
+            "multipleSelection"
+          ]
+        },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 40,
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "value"
+            ],
+            "properties": {
+              "label": {
+                "type": "string",
+                "maxLength": 4000
+              },
+              "value": {
+                "type": "string",
+                "maxLength": 4000
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "label",
+        "value",
+        "options"
+      ],
+      "additionalProperties": false
+    },
+    "DateTimeInput": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "DateTimeInput"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "value": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/DataBinding"
+            },
+            {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "pattern": "^/",
+                  "maxLength": 256
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "enableDate": {
+          "type": "boolean"
+        },
+        "enableTime": {
+          "type": "boolean"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "label",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "Slider": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Slider"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "value": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/DataBinding"
+            },
+            {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "pattern": "^/",
+                  "maxLength": 256
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "step": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "label",
+        "value",
+        "min",
+        "max"
+      ],
+      "additionalProperties": false
+    },
+    "CanvasPanel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "CanvasPanel"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "surfaceId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "label",
+        "surfaceId"
+      ],
+      "additionalProperties": false
+    },
+    "anyComponent": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Row"
+        },
+        {
+          "$ref": "#/$defs/Column"
+        },
+        {
+          "$ref": "#/$defs/List"
+        },
+        {
+          "$ref": "#/$defs/Text"
+        },
+        {
+          "$ref": "#/$defs/Image"
+        },
+        {
+          "$ref": "#/$defs/Icon"
+        },
+        {
+          "$ref": "#/$defs/Card"
+        },
+        {
+          "$ref": "#/$defs/Divider"
+        },
+        {
+          "$ref": "#/$defs/Link"
+        },
+        {
+          "$ref": "#/$defs/Button"
+        },
+        {
+          "$ref": "#/$defs/TextField"
+        },
+        {
+          "$ref": "#/$defs/CheckBox"
+        },
+        {
+          "$ref": "#/$defs/ChoicePicker"
+        },
+        {
+          "$ref": "#/$defs/DateTimeInput"
+        },
+        {
+          "$ref": "#/$defs/Slider"
+        },
+        {
+          "$ref": "#/$defs/CanvasPanel"
+        }
+      ]
+    },
+    "theme": {
+      "type": "object",
+      "maxProperties": 0
+    }
+  }
+}

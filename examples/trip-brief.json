@@ -1,0 +1,144 @@
+{
+  "text": "Set your preferences, then ask me to build your itinerary.",
+  "title": "Trip brief",
+  "messages": [
+    {
+      "version": "v0.9.1",
+      "createSurface": {
+        "surfaceId": "trip_brief",
+        "catalogId": "urn:a2ui-zero:catalog:1"
+      }
+    },
+    {
+      "version": "v0.9.1",
+      "updateComponents": {
+        "surfaceId": "trip_brief",
+        "components": [
+          {
+            "id": "root",
+            "component": "Column",
+            "children": [
+              "heading",
+              "name",
+              "echo",
+              "interests",
+              "date",
+              "budget",
+              "accessible",
+              "submit"
+            ]
+          },
+          {
+            "id": "heading",
+            "component": "Text",
+            "text": "Make this trip yours",
+            "variant": "h2"
+          },
+          {
+            "id": "name",
+            "component": "TextField",
+            "label": "Your destination",
+            "value": {
+              "path": "/destination"
+            },
+            "required": true
+          },
+          {
+            "id": "echo",
+            "component": "Text",
+            "text": {
+              "path": "/destination"
+            },
+            "variant": "body"
+          },
+          {
+            "id": "interests",
+            "component": "ChoicePicker",
+            "label": "Your focus",
+            "value": {
+              "path": "/interests"
+            },
+            "options": [
+              {
+                "label": "Art and museums",
+                "value": "art"
+              },
+              {
+                "label": "Food and neighborhoods",
+                "value": "food"
+              },
+              {
+                "label": "Nature and walks",
+                "value": "nature"
+              }
+            ],
+            "required": true
+          },
+          {
+            "id": "date",
+            "component": "DateTimeInput",
+            "label": "Travel date",
+            "value": {
+              "path": "/date"
+            },
+            "enableDate": true
+          },
+          {
+            "id": "budget",
+            "component": "Slider",
+            "label": "Daily budget (\u20ac)",
+            "value": {
+              "path": "/budget"
+            },
+            "min": 50,
+            "max": 300,
+            "step": 10
+          },
+          {
+            "id": "accessible",
+            "component": "CheckBox",
+            "label": "Prefer step-free routes",
+            "value": {
+              "path": "/accessible"
+            }
+          },
+          {
+            "id": "submit",
+            "component": "Button",
+            "child": "submit_label",
+            "variant": "primary",
+            "action": {
+              "event": {
+                "name": "user_message",
+                "context": {
+                  "message": "Plan an itinerary using these preferences. Do not book anything."
+                }
+              }
+            }
+          },
+          {
+            "id": "submit_label",
+            "component": "Text",
+            "text": "Build my itinerary",
+            "variant": "body"
+          }
+        ]
+      }
+    },
+    {
+      "version": "v0.9.1",
+      "updateDataModel": {
+        "surfaceId": "trip_brief",
+        "value": {
+          "destination": "Kyoto",
+          "interests": [
+            "art"
+          ],
+          "date": "",
+          "budget": 150,
+          "accessible": false
+        }
+      }
+    }
+  ]
+}

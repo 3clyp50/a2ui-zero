@@ -1,0 +1,7 @@
+name: a2ui_zero
+title: a2ui-zero
+description: Rich, interactive AI responses in chat and the canvas. Cards, images, forms, and choices that continue your conversation.
+version: 0.1.0
+settings_sections: []
+per_project_config: false
+per_agent_config: false

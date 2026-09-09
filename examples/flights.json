@@ -1,0 +1,192 @@
+{
+  "text": "Compare these two illustrative flight options. Choose one to continue; no booking is made.",
+  "title": "Rome → Tokyo",
+  "messages": [
+    {
+      "version": "v0.9.1",
+      "createSurface": {
+        "surfaceId": "flights",
+        "catalogId": "urn:a2ui-zero:catalog:1"
+      }
+    },
+    {
+      "version": "v0.9.1",
+      "updateComponents": {
+        "surfaceId": "flights",
+        "components": [
+          {
+            "id": "root",
+            "component": "Column",
+            "children": [
+              "note",
+              "options"
+            ]
+          },
+          {
+            "id": "note",
+            "component": "Text",
+            "text": "Examples only · fictional schedules and fares. 1 adult · Economy · One way.",
+            "variant": "caption"
+          },
+          {
+            "id": "options",
+            "component": "Row",
+            "children": [
+              "direct",
+              "connection"
+            ],
+            "align": "stretch"
+          },
+          {
+            "id": "direct",
+            "component": "Card",
+            "child": "direct_body"
+          },
+          {
+            "id": "direct_body",
+            "component": "Column",
+            "children": [
+              "direct_details",
+              "direct_footer"
+            ]
+          },
+          {
+            "id": "direct_title",
+            "component": "Text",
+            "text": "Direct · fewer stops",
+            "variant": "h3"
+          },
+          {
+            "id": "direct_time",
+            "component": "Text",
+            "text": "10:20 → 06:40 (+1)\n12 h 20 min · economy",
+            "variant": "body"
+          },
+          {
+            "id": "direct_price",
+            "component": "Text",
+            "text": "€820",
+            "variant": "h2"
+          },
+          {
+            "id": "direct_pick",
+            "component": "Button",
+            "child": "direct_pick_label",
+            "variant": "primary",
+            "action": {
+              "event": {
+                "name": "user_message",
+                "context": {
+                  "message": "I prefer the illustrative direct flight. Help me compare its tradeoffs; do not book anything."
+                }
+              }
+            }
+          },
+          {
+            "id": "direct_pick_label",
+            "component": "Text",
+            "text": "Choose direct",
+            "variant": "body"
+          },
+          {
+            "id": "connection",
+            "component": "Card",
+            "child": "connection_body"
+          },
+          {
+            "id": "connection_body",
+            "component": "Column",
+            "children": [
+              "connection_details",
+              "connection_footer"
+            ]
+          },
+          {
+            "id": "connection_title",
+            "component": "Text",
+            "text": "One stop · lower price",
+            "variant": "h3"
+          },
+          {
+            "id": "connection_time",
+            "component": "Text",
+            "text": "14:30 → 12:10 (+1)\n14 h 40 min · economy\nChange in Istanbul",
+            "variant": "body"
+          },
+          {
+            "id": "connection_price",
+            "component": "Text",
+            "text": "€650",
+            "variant": "h2"
+          },
+          {
+            "id": "connection_pick",
+            "component": "Button",
+            "child": "connection_pick_label",
+            "variant": "primary",
+            "action": {
+              "event": {
+                "name": "user_message",
+                "context": {
+                  "message": "I prefer the illustrative one-stop flight. Help me compare its tradeoffs; do not book anything."
+                }
+              }
+            }
+          },
+          {
+            "id": "connection_pick_label",
+            "component": "Text",
+            "text": "Choose one stop",
+            "variant": "body"
+          },
+          {
+            "id": "direct_details",
+            "component": "Column",
+            "children": [
+              "direct_title",
+              "direct_time"
+            ]
+          },
+          {
+            "id": "direct_footer",
+            "component": "Column",
+            "children": [
+              "direct_price",
+              "direct_basis",
+              "direct_pick"
+            ]
+          },
+          {
+            "id": "direct_basis",
+            "component": "Text",
+            "text": "per person",
+            "variant": "caption"
+          },
+          {
+            "id": "connection_details",
+            "component": "Column",
+            "children": [
+              "connection_title",
+              "connection_time"
+            ]
+          },
+          {
+            "id": "connection_footer",
+            "component": "Column",
+            "children": [
+              "connection_price",
+              "connection_basis",
+              "connection_pick"
+            ]
+          },
+          {
+            "id": "connection_basis",
+            "component": "Text",
+            "text": "per person",
+            "variant": "caption"
+          }
+        ]
+      }
+    }
+  ]
+}

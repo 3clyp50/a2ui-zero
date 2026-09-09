@@ -1,0 +1,25 @@
+<html>
+<head><script type="module" src="/plugins/a2ui_zero/webui/store.js"></script></head>
+<body>
+  <div x-data>
+    <template x-if="$store.a2uiZero">
+      <section class="a2ui-panel" x-effect="$store.a2uiZero.setContext($store.chats.selected)">
+        <div class="a2ui-panel-toolbar" x-show="$store.a2uiZero.list.length">
+          <select aria-label="A2UI view" x-model="$store.a2uiZero.selectedId">
+            <template x-for="surface in $store.a2uiZero.list" :key="surface.id">
+              <option :value="surface.id" x-text="surface.title"></option>
+            </template>
+          </select>
+          <button type="button" class="text-button" @click="$store.a2uiZero.refresh()" aria-label="Refresh A2UI views"><x-icon name="refresh"></x-icon></button>
+        </div>
+        <div x-effect="$store.a2uiZero.renderPanel($el)"></div>
+        <div class="a2ui-empty" x-show="!$store.a2uiZero.list.length">
+          <x-icon name="widgets"></x-icon>
+          <p>Room for a richer answer.</p>
+          <p>Ask for a visual comparison, a place guide, or an interactive plan in this chat.</p>
+        </div>
+      </section>
+    </template>
+  </div>
+</body>
+</html>
