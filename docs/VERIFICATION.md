@@ -129,3 +129,38 @@ Reference implementation: `keyboardstaff/attachment_preview` at
 `aae4c890a5fba3d84d0b49ff6f90493ed7b212f6`, MIT, copyright 2026 Wabifocus.
 DeepAPI repository inspection succeeded (request
 `7dd3a33e-29eb-49a7-962a-30e27fe100d0`); source attribution is retained in LICENSE.
+
+## Compact instructions (0.2.1)
+
+Shortened directives and catalog notation; kept all 18 components, protocol and
+action rules, media routing, layout guidance, and a complete inline example.
+The example demonstrates surface creation, text/checkbox bindings, initial data,
+and submission. The three full examples under `examples/` are unchanged.
+
+Measured against 0.2.0 using Agent Zero's `cl100k_base` counter:
+
+| Instruction text | Before | After | Saved |
+| --- | ---: | ---: | ---: |
+| Source Markdown | 1,240 | 862 | 378 (30.5%) |
+| Rendered prompt | 1,234 | 856 | 378 (30.6%) |
+| Native tool description | 1,280 | 922 | 358 (28.0%) |
+
+Native tool identity and parameter schema are unchanged. Counts exclude request
+wrapping and generated UI output; provider tokenization and caching affect billing.
+
+Validation at localhost:32081 used the current Cerebras `gpt-oss-120b` preset:
+
+- The final prompt produced image/audio/video previews, radio choices, a checkbox,
+  custom notes, and Continue in one A2UI call, with no warnings in that creation
+  turn. All three previews loaded.
+- Continue submitted the selected video, true checkbox value, and custom note as
+  one user message; the agent acknowledged all three correctly.
+- Eleven protocol tests passed, including validation and submission of the exact
+  inline prompt example.
+- An initial draft without an example was rejected: the model copied an abstract
+  `OP` placeholder literally. Intermediate checks also exposed an omitted fallback
+  and invented checkbox properties. The final prompt uses a complete example,
+  explicit required arguments, and the exact checkbox shape.
+
+This is focused live evidence for the named model, not a guarantee for every
+model or task. No model settings, renderer behavior, or protocol validation changed.

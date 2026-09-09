@@ -1,67 +1,44 @@
 ### a2ui
-Respond with rich interactive cards, images, choices or forms in the user's chat.
-Prefer this over a text-only response when the user would benefit from choosing,
-comparing or entering information. Ordinary prose still uses response.
-`show` IS a final response: it ends your turn. Provide a useful, brief `text` fallback
-(1–3 sentences); the WebUI shows the rich surface instead of duplicating this text.
-Use real retrieved facts, image URLs and source links; label illustrative data.
-Never imply a choice books, pays, or executes something: it sends a user message.
+rich chat cards, forms, media; ordinary prose -> response
+args: action show(default)|inspect
+show REQUIRED: text (nonempty fallback), messages
+optional: title, placement chat(default)|canvas, open_in_canvas (only if requested)
+show ends turn; inspect reads current chat UI, keeps turn open
+buttons send visible user messages + form values, never execute/book/pay
+real sources/files; label examples; no secrets, HTML, scripts, CSS, client functions
 
-Args: action `show` (default) or `inspect`; text; optional title; messages (array).
-Optional placement `chat` (default) or `canvas`; open_in_canvas true only if useful
-and requested. `inspect` returns this chat's current surfaces without ending turn.
-Each message uses version `v0.9.1` and exactly one A2UI operation:
-- createSurface: {surfaceId, catalogId:"urn:a2ui-zero:catalog:1"}
-- updateComponents: {surfaceId, components:[{id, component, ...properties}]}
-- updateDataModel: {surfaceId, path:"/", value:{...}}; replaces the path, omitted value deletes it
-- deleteSurface: {surfaceId}
-Create once; later reuse surfaceId to update. Root component id is `root`.
-IDs: 1–48 letters/digits/underscores/hyphens. Max 16 surfaces, 160 components each.
-Components are flat with child IDs. Text values may be strings or {path:"/field"}.
+messages: array of envelopes, each with version:"v0.9.1" and one operation below:
+- createSurface: surfaceId, catalogId:"urn:a2ui-zero:catalog:1"
+- updateComponents: surfaceId, components:[{id,component,...}]
+- updateDataModel: surfaceId, path:"/", value:{...}; replaces path, omitted value deletes
+- deleteSurface: surfaceId
+create once; reuse surfaceId for updates. root id="root"; flat child-ID references
+IDs: 1–48 letters/digits/_/-; max 16 surfaces,160 components/surface
+Text.text/media url/poster: literal or {path:"/field"}. inputs value:{path:"/field"}; types below describe bound data. initialize via updateDataModel; distinct input paths
 
-Catalog (only these properties; no HTML, scripts, CSS or client function calls):
-- Column, Row, List: children:[ids]; optional align start/center/end/stretch, justify start/center/end/spaceBetween/spaceAround
-- Card: child:id
-- Text: text; optional variant h1/h2/h3/body/caption
-- Image: url, alt; optional caption, fit cover/contain (default contain)
-- Audio: url, title; optional caption
-- Video: url, title; optional caption, poster (image URL)
-- Icon: name (Material Symbols name)
-- Divider: no extra properties
-- Link: text, url (HTTP(S))
-- Button: child (Text id), action:{event:{name:"user_message",context:{message:"Visible user request"}}}; optional variant primary/secondary/borderless
-- TextField: label, value:{path:"/field"}; optional variant shortText/longText/number, required
-- CheckBox: label, value:{path:"/field"} (boolean)
-- ChoicePicker: label, value:{path:"/field"} (array of option values), options:[{label,value}]; optional variant mutuallyExclusive/multipleSelection, required
-- DateTimeInput: label, value:{path:"/field"} (string); optional enableDate, enableTime, required
-- Slider: label, value:{path:"/field"} (number), min, max; optional step
-- CanvasPanel: label, surfaceId (opens that surface in the right canvas)
-Initialize form values using updateDataModel. Every Button sends its message plus
-the surface's entered fields. Buttons never send hidden instructions or execute code.
-Media accepts known HTTP(S) URLs or existing files inside /a0, including generated
-outputs and uploads. Use an absolute /a0/... path, file:///a0/..., or img:///a0/...
-for local files; never embed base64 data or invent paths. URL and poster can bind
-to the data model. Local files stream with seek support; playback is user-started.
-Prefer media cards in chat, with a caption and related choices. Images open the
-native zoom/pan viewer; audio/video play inline and can expand in Media Viewer.
-For a small set of media, use Cards in a Row so previews sit side by side when
-space permits. Media cards already show their title and caption; avoid repeating
-these in separate Text components unless they add context.
-The same cards work in the A2UI canvas. Ordinary response links to media files
-also receive inline previews, so generated media does not require a special form.
-Keep scripts, code, and text in the existing Editor workflow. Browser codecs
-determine which audio/video files play; the original file remains downloadable.
-Compose for scanning: a concise surface title, a short caption for context, and
-one clear primary choice per option. Avoid repeating titles, caveats or actions.
-For comparisons, put sibling Cards in a Row with align stretch (the default).
-Each Card's child should be a Column: content first, then a final Button or a
-footer Column/Row containing the price/summary and buttons. The renderer stretches
-card bodies and anchors these trailing actions at the bottom, even when copy wraps.
-Use the built-in Open in canvas action for the current surface; use CanvasPanel
-for a distinct workspace action, never a user_message Button just to open a view.
-Examples and full schema: /a0/usr/plugins/a2ui_zero/examples/ and schema/catalog.json.
+catalog (only listed fields; ?optional):
+- Column/Row/List children:[ids]; ?align start/center/end/stretch, justify start/center/end/spaceBetween/spaceAround
+- Card child:id; Divider no fields; Icon name (Material Symbols)
+- Text text; ?variant h1/h2/h3/body/caption
+- Image url,alt; ?caption,fit contain/cover
+- Audio url,title; ?caption
+- Video url,title; ?caption,poster:image_source
+- Link text,url:HTTP(S)
+- Button child:Text_id, action:{event:{name:"user_message",context:{message:"visible request"}}}; ?variant primary/secondary/borderless
+- TextField label,value; ?variant shortText/longText/number,required
+- CheckBox label,value:{path:"/field"} only; data:boolean
+- ChoicePicker label,value:array,options:[{label,value}]; ?variant mutuallyExclusive/multipleSelection,required
+- DateTimeInput label,value:string; ?enableDate,enableTime,required
+- Slider label,value:number,min,max; ?step
+- CanvasPanel label,surfaceId: opens another surface, no user turn
 
-Example:
+media: known HTTP(S) URLs or existing /a0/... files; file:///a0/... and img:///a0/... also valid. no base64/invented paths
+inline playback + viewer; ordinary media links also preview. code/text -> Editor
+layout: concise title/caption; no repetition. comparisons/media -> Row of Cards with Column bodies, trailing button/footer for aligned actions; narrow views stack
+current surface already has Open in canvas; never send a message just to open it
+full schema/examples: /a0/usr/plugins/a2ui_zero/schema/catalog.json and examples/
+
+example: bound text + checkbox + submit; actual values go in data
 ~~~json
-{"tool_name":"a2ui","tool_args":{"text":"Which direction would you like to explore?","messages":[{"version":"v0.9.1","createSurface":{"surfaceId":"directions","catalogId":"urn:a2ui-zero:catalog:1"}},{"version":"v0.9.1","updateComponents":{"surfaceId":"directions","components":[{"id":"root","component":"Column","children":["intro","choose"]},{"id":"intro","component":"Text","text":"Plan your visit","variant":"h2"},{"id":"choose","component":"Button","child":"label","variant":"primary","action":{"event":{"name":"user_message","context":{"message":"Build me a walking itinerary."}}}},{"id":"label","component":"Text","text":"Walking itinerary"}]}}]}}
+{"tool_name":"a2ui","tool_args":{"text":"Where to?","messages":[{"version":"v0.9.1","createSurface":{"surfaceId":"trip","catalogId":"urn:a2ui-zero:catalog:1"}},{"version":"v0.9.1","updateComponents":{"surfaceId":"trip","components":[{"id":"root","component":"Column","children":["destination","details","submit"]},{"id":"destination","component":"TextField","label":"Destination","value":{"path":"/destination"},"required":true},{"id":"details","component":"CheckBox","label":"Details","value":{"path":"/details"}},{"id":"submit","component":"Button","child":"label","action":{"event":{"name":"user_message","context":{"message":"Plan my trip."}}}},{"id":"label","component":"Text","text":"Continue"}]}},{"version":"v0.9.1","updateDataModel":{"surfaceId":"trip","path":"/","value":{"destination":"Rome","details":false}}}]}}
 ~~~

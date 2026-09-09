@@ -27,6 +27,14 @@ def envelope(kind, **args):
 
 
 class ProtocolTests(unittest.TestCase):
+    def test_inline_prompt_example(self):
+        prompt = (ROOT / "prompts/agent.system.tool.a2ui.md").read_text()
+        call = json.loads(prompt.split("~~~json\n", 1)[1].split("\n~~~", 1)[0])
+        self.assertEqual(call["tool_name"], "a2ui")
+        state, _, _ = p.apply_messages(None, call["tool_args"]["messages"])
+        message = p.action_message(state["surfaces"]["trip"], "submit", {"/destination": "Kyoto"})
+        self.assertEqual(message, "Plan my trip.\nDestination: Kyoto\nDetails: false")
+
     def test_media_sources_and_containment(self):
         for source in ("/a0/usr/My clip.mp4", "file:///a0/usr/My%20clip.mp4",
                        "/api/download_work_dir_file?path=%2Fa0%2Fusr%2FMy%20clip.mp4"):
