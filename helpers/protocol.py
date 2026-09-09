@@ -7,7 +7,7 @@ import re
 from datetime import date, datetime, time
 from functools import lru_cache
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import best_match
@@ -19,6 +19,57 @@ INPUTS = {"TextField", "CheckBox", "ChoicePicker", "DateTimeInput", "Slider"}
 BAD_KEYS = {"__proto__", "prototype", "constructor"}
 ID = re.compile(r"^[A-Za-z0-9_-]{1,48}$")
 MISSING = object()
+MEDIA_TYPES = {
+    **dict.fromkeys((".jpg", ".jpeg"), "image/jpeg"),
+    ".png": "image/png", ".apng": "image/apng", ".gif": "image/gif",
+    ".bmp": "image/bmp", ".webp": "image/webp", ".avif": "image/avif",
+    ".svg": "image/svg+xml", ".svgz": "image/svg+xml", ".ico": "image/x-icon",
+    ".mp4": "video/mp4", ".webm": "video/webm", ".ogv": "video/ogg", ".mov": "video/quicktime",
+    ".mp3": "audio/mpeg", ".wav": "audio/wav", ".flac": "audio/flac",
+    ".aac": "audio/aac", ".m4a": "audio/mp4", ".ogg": "audio/ogg", ".opus": "audio/ogg",
+}
+MEDIA_ROUTES = {"/api/image_get", "/api/download_work_dir_file", "/api/plugins/a2ui_zero/media"}
+
+
+def media_path(value):
+    """Accept explicit Agent Zero file references, never arbitrary API routes."""
+    if not isinstance(value, str) or len(value) > 4000 or any(ord(c) < 32 for c in value) or "\\" in value:
+        raise ValueError("Invalid media source")
+    if value.startswith("/a0/"):
+        path = value
+    else:
+        parsed = urlsplit(value)
+        if parsed.scheme in ("file", "img") and not parsed.netloc and not parsed.query and not parsed.fragment:
+            path = unquote(parsed.path)
+        elif not parsed.scheme and not parsed.netloc and parsed.path in MEDIA_ROUTES:
+            query = parse_qs(parsed.query)
+            if set(query) - {"path", "t"} or len(query.get("path", [])) != 1:
+                raise ValueError("Invalid media file URL")
+            path = query["path"][0]
+        else:
+            return None
+    if not path.startswith("/a0/") or any(part in (".", "..") for part in path.split("/")) or "\\" in path or any(ord(c) < 32 for c in path):
+        raise ValueError("Media files must be inside /a0")
+    if Path(path).suffix.lower() not in MEDIA_TYPES:
+        raise ValueError("Unsupported media file type")
+    return path
+
+
+def resolve_media_path(value, base_dir):
+    path = media_path(value)
+    if path is None:
+        raise ValueError("Expected an Agent Zero media file")
+    base = Path(base_dir).resolve()
+    resolved = (base / path.removeprefix("/a0/")).resolve()
+    if not resolved.is_relative_to(base):
+        raise ValueError("Media file is outside Agent Zero")
+    return resolved
+
+
+def safe_media_url(value):
+    if media_path(value) is None:
+        safe_url(value)
+    return value
 
 
 @lru_cache
@@ -144,10 +195,14 @@ def validate_surface(surface):
         for value in component.values():
             if isinstance(value, dict) and "path" in value:
                 pointer(value["path"])
-        if kind in ("Image", "Link"):
+        if kind in ("Image", "Audio", "Video", "Link"):
             url = resolve(component["url"], surface["data"])
             if url is not None:
-                safe_url(url)
+                (safe_url if kind == "Link" else safe_media_url)(url)
+        if kind == "Video" and "poster" in component:
+            poster = resolve(component["poster"], surface["data"])
+            if poster is not None:
+                safe_media_url(poster)
         if kind in INPUTS and not pointer(component["value"]["path"]):
             raise ValueError("Inputs must bind to a field, not the entire data model")
         if kind in INPUTS:

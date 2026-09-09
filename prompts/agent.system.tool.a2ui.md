@@ -23,7 +23,9 @@ Catalog (only these properties; no HTML, scripts, CSS or client function calls):
 - Column, Row, List: children:[ids]; optional align start/center/end/stretch, justify start/center/end/spaceBetween/spaceAround
 - Card: child:id
 - Text: text; optional variant h1/h2/h3/body/caption
-- Image: url (HTTP(S)), alt; optional caption, fit cover/contain
+- Image: url, alt; optional caption, fit cover/contain (default contain)
+- Audio: url, title; optional caption
+- Video: url, title; optional caption, poster (image URL)
 - Icon: name (Material Symbols name)
 - Divider: no extra properties
 - Link: text, url (HTTP(S))
@@ -36,7 +38,19 @@ Catalog (only these properties; no HTML, scripts, CSS or client function calls):
 - CanvasPanel: label, surfaceId (opens that surface in the right canvas)
 Initialize form values using updateDataModel. Every Button sends its message plus
 the surface's entered fields. Buttons never send hidden instructions or execute code.
-Images require known valid URLs; do not fabricate image URLs.
+Media accepts known HTTP(S) URLs or existing files inside /a0, including generated
+outputs and uploads. Use an absolute /a0/... path, file:///a0/..., or img:///a0/...
+for local files; never embed base64 data or invent paths. URL and poster can bind
+to the data model. Local files stream with seek support; playback is user-started.
+Prefer media cards in chat, with a caption and related choices. Images open the
+native zoom/pan viewer; audio/video play inline and can expand in Media Viewer.
+For a small set of media, use Cards in a Row so previews sit side by side when
+space permits. Media cards already show their title and caption; avoid repeating
+these in separate Text components unless they add context.
+The same cards work in the A2UI canvas. Ordinary response links to media files
+also receive inline previews, so generated media does not require a special form.
+Keep scripts, code, and text in the existing Editor workflow. Browser codecs
+determine which audio/video files play; the original file remains downloadable.
 Compose for scanning: a concise surface title, a short caption for context, and
 one clear primary choice per option. Avoid repeating titles, caveats or actions.
 For comparisons, put sibling Cards in a Row with align stretch (the default).

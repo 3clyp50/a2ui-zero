@@ -1,6 +1,6 @@
 # a2ui-zero
 
-Rich answers that belong in Agent Zero: interactive cards, images, comparisons,
+Rich answers that belong in Agent Zero: interactive cards, images, audio, video, comparisons,
 forms, and choices in chat, with room for larger views in the right canvas.
 
 ![a2ui-zero](webui/thumbnail.webp)
@@ -43,6 +43,7 @@ agent-provided URL. Its schema is in [schema/catalog.json](schema/catalog.json).
 | --- | --- |
 | Layout | Column, Row, List, Card, Divider |
 | Content | Text, Image, Icon, Link |
+| Media | Audio, Video |
 | Choices | Button, ChoicePicker |
 | Forms | TextField, CheckBox, DateTimeInput, Slider |
 | Workspace | CanvasPanel |
@@ -63,6 +64,41 @@ and updates these components at runtime. A questionnaire can combine several
 radio or checkbox groups with separate text fields for custom answers, then
 submit them together. Conditional fields require an agent update; choosing
 "Other" does not automatically reveal a text field.
+
+## Media previews
+
+![Generated image, audio, and video cards in Agent Zero](docs/screenshots/media-cards.png)
+
+Images, audio, and video play directly in rich chat cards, including files created
+by generation tools. Image cards open Agent Zero's existing zoom/pan viewer.
+Audio and video use native playback controls and can expand in the native modal
+shell. The same A2UI components also work in the right canvas.
+
+Ordinary assistant replies containing media file links receive inline preview
+cards automatically, without another model call. Existing Markdown images keep
+their native preview and image viewer. Text, scripts, and code retain their
+existing file and Editor behavior.
+
+- `Image`: `url`, `alt`; optional `caption` and `fit` (`contain` or `cover`).
+- `Audio`: `url`, `title`; optional `caption`.
+- `Video`: `url`, `title`; optional `caption` and `poster` (an image source).
+
+Sources may be HTTP(S) URLs or existing files inside `/a0`, such as
+`/a0/usr/workdir/output.mp4`, `file:///a0/usr/uploads/recording.wav`, or
+`img:///a0/usr/workdir/generated.png`. Standard Agent Zero image/download links
+are also recognized. URL and poster fields support data-model bindings.
+Use actual output paths from tools; the plugin does not generate media itself.
+
+Local files stream through an authenticated, media-only endpoint with byte-range
+support for seeking. Files outside `/a0`, including escaping symlinks, are rejected.
+Playback starts only on user interaction; opening an expanded player pauses its
+inline counterpart, and closing it releases playback.
+
+Recognized formats: JPEG, PNG/APNG, GIF, BMP, WebP, AVIF, SVG/SVGZ, ICO;
+MP4, WebM, OGV, MOV; MP3, WAV, FLAC, AAC, M4A, OGG, and Opus. OGG defaults to
+audio; use an explicit `Video` component for an Ogg video. Playback depends on
+the browser's codecs; unsupported files keep an original-file link. No transcoder,
+external player, autoplay, HTML, PDF, or code preview is added.
 
 ## Agent tool
 
@@ -108,8 +144,9 @@ are preserved; a choice never moves to a different chat.
   completed tool call. Partial JSON tokens are not rendered.
 - Up to 16 surfaces / 500 KB state per chat, 160 component definitions per
   surface, 512 expanded nodes, 24 nesting levels, and 4,000 characters per value.
-- Images and links accept HTTP(S) URLs plus plugin-owned assets. External images
-  are fetched by the browser, with no referrer. Text remains selectable plain text;
+- Media accepts the sources described above; ordinary Link components accept
+  HTTP(S) URLs plus plugin-owned assets. External media is fetched by the browser;
+  images use no referrer. Text remains selectable plain text;
   the normal response fallback can still use Agent Zero Markdown.
 - Disable/remove through Plugins. Hooks create no external files or processes and
   never alter shared dependencies. Saved chat snapshots remain; the readable
@@ -124,7 +161,20 @@ conda run --no-capture-output -n a0 python -m unittest discover -s tests -v
 node tests/renderer.test.mjs
 ```
 
+For the streaming API check, run inside the installed Agent Zero framework:
+
+```bash
+cd /a0/usr/plugins/a2ui_zero
+PYTHONPATH=/a0 /opt/venv-a0/bin/python tests/check_media_api.py
+```
+
 See the [implementation plan](docs/PLAN.md), [verification report](docs/VERIFICATION.md),
 and [artwork provenance](docs/ARTWORK.md). Plugin code is MIT licensed; the two
 upstream A2UI schemas retain their Apache 2.0 license and attribution in
 [schema/NOTICE.md](schema/NOTICE.md).
+
+Media preview coverage and inline file-serving approach are adapted from
+[keyboardstaff/attachment_preview](https://github.com/keyboardstaff/attachment_preview)
+by **Wabifocus (keyboardstaff)**, MIT licensed. Attribution is retained in the
+root [LICENSE](LICENSE); the reference revision is
+`aae4c890a5fba3d84d0b49ff6f90493ed7b212f6`.

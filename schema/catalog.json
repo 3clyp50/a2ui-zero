@@ -934,12 +934,168 @@
         },
         {
           "$ref": "#/$defs/CanvasPanel"
+        },
+        {
+          "$ref": "#/$defs/Audio"
+        },
+        {
+          "$ref": "#/$defs/Video"
         }
       ]
     },
     "theme": {
       "type": "object",
       "maxProperties": 0
+    },
+    "Audio": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Audio"
+        },
+        "url": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "common_types.json#/$defs/DataBinding"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "pattern": "^/",
+                      "maxLength": 256
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          ]
+        },
+        "caption": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 4000
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "url",
+        "title"
+      ],
+      "additionalProperties": false
+    },
+    "Video": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "allOf": [
+            {
+              "$ref": "common_types.json#/$defs/ComponentId"
+            },
+            {
+              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
+            }
+          ]
+        },
+        "component": {
+          "const": "Video"
+        },
+        "url": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "common_types.json#/$defs/DataBinding"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "pattern": "^/",
+                      "maxLength": 256
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          ]
+        },
+        "caption": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "poster": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "common_types.json#/$defs/DataBinding"
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "path"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string",
+                      "pattern": "^/",
+                      "maxLength": 256
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "component",
+        "url",
+        "title"
+      ],
+      "additionalProperties": false
     }
   }
 }

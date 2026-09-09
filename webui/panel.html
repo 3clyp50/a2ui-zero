@@ -1,7 +1,7 @@
 <html>
 <head><script type="module" src="/plugins/a2ui_zero/webui/store.js"></script></head>
 <body>
-  <div x-data>
+  <div x-data="{ destroy() { $store.a2uiZero.stopMedia($el); } }">
     <template x-if="$store.a2uiZero">
       <section class="a2ui-panel" x-effect="$store.a2uiZero.setContext($store.chats.selected)">
         <div class="a2ui-panel-toolbar" x-show="$store.a2uiZero.list.length">

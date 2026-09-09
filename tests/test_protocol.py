@@ -5,6 +5,7 @@ import importlib.util
 import json
 from pathlib import Path
 import unittest
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("a2ui_zero_protocol", ROOT / "helpers/protocol.py")
@@ -26,6 +27,38 @@ def envelope(kind, **args):
 
 
 class ProtocolTests(unittest.TestCase):
+    def test_media_sources_and_containment(self):
+        for source in ("/a0/usr/My clip.mp4", "file:///a0/usr/My%20clip.mp4",
+                       "/api/download_work_dir_file?path=%2Fa0%2Fusr%2FMy%20clip.mp4"):
+            self.assertEqual(p.media_path(source), "/a0/usr/My clip.mp4")
+        for source in ("file:///etc/clip.mp4", "file://localhost/a0/clip.mp4", "file:///a0/../clip.mp4",
+                       "file:///a0/%2e%2e/clip.mp4", "/a0/usr/code.html", "data:audio/wav;base64,abc",
+                       "/api/private?path=/a0/test.png", "/api/image_get?path=/etc/test.png",
+                       "/api/image_get?path=/a0/a.png&path=/a0/b.png"):
+            with self.subTest(source=source), self.assertRaises(ValueError): p.safe_media_url(source)
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory) / "a0"
+            base.mkdir()
+            (base / "escape").symlink_to(Path(directory), target_is_directory=True)
+            with self.assertRaises(ValueError): p.resolve_media_path("/a0/escape/test.mp4", base)
+            self.assertEqual(p.resolve_media_path("/a0/safe.mp4", base), base / "safe.mp4")
+
+    def test_media_components_and_bound_updates(self):
+        for kind, suffix in (("Image", "png"), ("Audio", "wav"), ("Video", "mp4")):
+            component = {"id": "root", "component": kind, "url": {"path": "/source"},
+                         "alt" if kind == "Image" else "title": "Generated media"}
+            if kind == "Video": component["poster"] = {"path": "/poster"}
+            messages = [envelope("createSurface", surfaceId="media", catalogId=p.CATALOG),
+                        envelope("updateComponents", surfaceId="media", components=[component]),
+                        envelope("updateDataModel", surfaceId="media", path="/", value={
+                            "source": f"/a0/usr/output.{suffix}", "poster": "img:///a0/usr/poster.png"})]
+            state, _, _ = p.apply_messages(None, messages)
+            with self.assertRaises(ValueError):
+                p.apply_messages(state, [envelope("updateDataModel", surfaceId="media", path="/source", value="javascript:alert(1)")])
+            if kind == "Video":
+                with self.assertRaises(ValueError):
+                    p.apply_messages(state, [envelope("updateDataModel", surfaceId="media", path="/poster", value="/etc/secret.png")])
+
     def test_examples_validate_and_roundtrip(self):
         for path in (ROOT / "examples").glob("*.json"):
             state = apply_example(path.stem)

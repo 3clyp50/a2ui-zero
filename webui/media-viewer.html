@@ -1,0 +1,10 @@
+<html>
+<head>
+  <title>Media Viewer</title>
+  <script type="module" src="/plugins/a2ui_zero/webui/store.js"></script>
+</head>
+<body>
+  <div x-data="{ destroy() { $store.a2uiZero.stopMedia($el); } }" class="a2ui-media-viewer"
+       x-effect="$store.a2uiZero.renderMediaViewer($el)"></div>
+</body>
+</html>

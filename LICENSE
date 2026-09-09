@@ -1,6 +1,11 @@
 MIT License
 
 Copyright (c) 2026 a2ui-zero contributors
+Copyright (c) 2026 Wabifocus
+
+Media preview coverage and inline file-serving approach adapted from
+keyboardstaff/attachment_preview (https://github.com/keyboardstaff/attachment_preview),
+by Wabifocus (keyboardstaff), under the MIT License below.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

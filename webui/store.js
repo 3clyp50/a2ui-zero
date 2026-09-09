@@ -4,11 +4,15 @@ import { store as chats } from "/components/sidebar/chats/chats-store.js";
 import { open as openSurface } from "/js/surfaces.js";
 import { toastFrontendError } from "/components/notifications/notification-store.js";
 import { renderSurface, forgetDrafts } from "./renderer.js";
+import { createMediaCard, previewAttachments, stopMedia } from "./media.js";
+import { store as imageViewer } from "/components/modals/image-viewer/image-viewer-store.js";
+import { openModal, closeModal } from "/js/modals.js";
 
 const endpoint = "/plugins/a2ui_zero/surfaces";
 const sending = new Set();
 const autoOpened = new Set();
 let loading = null;
+const mediaModal = "/plugins/a2ui_zero/webui/media-viewer.html";
 if (!document.querySelector('link[data-a2ui-zero]')) {
   const css = document.createElement("link");
   css.rel = "stylesheet"; css.href = "/plugins/a2ui_zero/webui/a2ui.css"; css.dataset.a2uiZero = "";
@@ -16,11 +20,13 @@ if (!document.querySelector('link[data-a2ui-zero]')) {
 }
 
 export const store = createStore("a2uiZero", {
-  contextId: "", surfaces: {}, revision: 0, selectedId: "",
+  contextId: "", surfaces: {}, revision: 0, selectedId: "", activeMedia: null,
   get list() { return Object.values(this.surfaces); },
 
   async setContext(contextId) {
     if (contextId === this.contextId) return loading;
+    if (this.activeMedia) void closeModal(mediaModal);
+    for (const card of document.querySelectorAll(".a2ui-media")) stopMedia(card);
     this.contextId = contextId || "";
     this.surfaces = {}; this.revision = 0; this.selectedId = "";
     forgetDrafts(this.contextId);
@@ -80,7 +86,22 @@ export const store = createStore("a2uiZero", {
       canvas,
       onOpen: id => this.open(id, contextId),
       onAction: (current, componentId, values) => this.act(contextId, current, componentId, values),
+      onMedia: source => this.openMedia(source),
     });
+  },
+
+  openMedia(source) {
+    if (source.type === "image") return imageViewer.open(source.url, { name: source.title });
+    this.activeMedia = source;
+    void openModal(mediaModal).finally(() => { this.activeMedia = null; });
+  },
+
+  stopMedia,
+
+  renderMediaViewer(element) {
+    stopMedia(element);
+    element.replaceChildren();
+    if (this.activeMedia) element.append(createMediaCard(this.activeMedia, { expanded: true }));
   },
 
   renderPanel(element) {
@@ -88,6 +109,7 @@ export const store = createStore("a2uiZero", {
     const key = `${this.contextId}:${surface?.id || ""}:${surface?.revision || 0}`;
     if (element.dataset.renderKey === key) return;
     element.dataset.renderKey = key;
+    stopMedia(element);
     element.replaceChildren();
     if (surface) element.append(this.render(surface, this.contextId, true));
   },
@@ -96,7 +118,11 @@ export const store = createStore("a2uiZero", {
     await this.setContext(chats.selected);
     for (const entry of batch.results || []) {
       const payload = entry.args?.kvps?.a2ui_zero;
-      if (!payload) continue;
+      if (!payload) {
+        const response = entry.result?.element?.querySelector(".message-agent-response");
+        previewAttachments(response, source => this.openMedia(source), entry.args?.kvps?.attachments);
+        continue;
+      }
       this.ingest(payload);
       const container = entry.result?.element?.querySelector(".message-agent-response") || entry.result?.element;
       if (!container || payload.context_id !== chats.selected) continue;
@@ -104,6 +130,7 @@ export const store = createStore("a2uiZero", {
       if (!rich) { rich = document.createElement("div"); rich.className = "a2ui-response"; container.append(rich); }
       if (rich.dataset.revision === String(payload.revision)) continue;
       rich.dataset.revision = payload.revision;
+      stopMedia(rich);
       rich.replaceChildren();
       for (const surface of Object.values(payload.surfaces || {})) {
         if (surface.placement === "canvas") {
@@ -130,7 +157,7 @@ export const store = createStore("a2uiZero", {
       const version = view.querySelector(".a2ui-version");
       version.hidden = false;
       version.textContent = latest ? "Earlier version" : "Removed";
-      view.querySelectorAll(".a2ui-tree button, input, textarea").forEach(control => { control.disabled = true; });
+      view.querySelectorAll(".a2ui-tree .a2ui-button, input, textarea").forEach(control => { control.disabled = true; });
       if (!latest) view.querySelector(".a2ui-heading button")?.setAttribute("disabled", "");
     }
   },

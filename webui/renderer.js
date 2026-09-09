@@ -1,3 +1,6 @@
+import { safeUrl, mediaSource, createMediaCard, stopMedia } from "./media.js";
+export { safeUrl } from "./media.js";
+
 const drafts = new Map();
 const forbidden = new Set(["__proto__", "prototype", "constructor"]);
 
@@ -10,15 +13,6 @@ export function parts(path) {
 
 export function read(data, path) {
   return parts(path).reduce((value, key) => value?.[key], data);
-}
-
-export function safeUrl(value) {
-  if (typeof value !== "string" || /[\s\\\x00-\x1f]/.test(value)) return "";
-  if (value.startsWith("/plugins/a2ui_zero/") && !value.includes("..") && !value.includes("%")) return value;
-  try {
-    const url = new URL(value);
-    return ["https:", "http:"].includes(url.protocol) && !url.username && !url.password ? url.href : "";
-  } catch { return ""; }
 }
 
 function element(tag, className = "", text = null) {
@@ -41,7 +35,7 @@ export function forgetDrafts(contextId) {
   for (const key of drafts.keys()) if (!key.startsWith(`${contextId}:`)) drafts.delete(key);
 }
 
-export function renderSurface(surface, contextId, { onAction, onOpen, canvas = false }) {
+export function renderSurface(surface, contextId, { onAction, onOpen, onMedia, canvas = false }) {
   const draft = draftFor(contextId, surface);
   const root = element("section", "a2ui-surface");
   root.dataset.surfaceId = surface.id;
@@ -97,25 +91,22 @@ export function renderSurface(surface, contextId, { onAction, onOpen, canvas = f
       const variant = ["h1", "h2", "h3"].includes(component.variant) ? component.variant : "p";
       node = element(variant, `a2ui-text ${component.variant === "caption" ? "a2ui-caption" : ""}`);
       bind(node, component.text, value => { node.textContent = value ?? ""; });
-    } else if (kind === "Image") {
-      node = element("figure", "a2ui-image");
-      const img = element("img");
-      img.alt = component.alt;
-      img.loading = "lazy";
-      img.referrerPolicy = "no-referrer";
-      img.style.objectFit = component.fit === "contain" ? "contain" : "cover";
-      const fallback = element("span", "a2ui-image-fallback", component.alt);
-      fallback.hidden = true;
-      img.addEventListener("error", () => { img.hidden = true; fallback.hidden = false; });
-      bind(img, component.url, value => {
-        const url = safeUrl(value);
-        if (img.getAttribute("src") !== url) {
-          img.hidden = !url; fallback.hidden = Boolean(url);
-          if (url) img.src = url; else img.removeAttribute("src");
-        }
-      });
-      node.append(img, fallback);
-      if (component.caption) node.append(element("figcaption", "a2ui-caption", component.caption));
+    } else if (["Image", "Audio", "Video"].includes(kind)) {
+      node = element("div", "a2ui-media-slot");
+      const update = () => {
+        const source = mediaSource(valueOf(component.url), kind.toLowerCase());
+        const poster = component.poster ? mediaSource(valueOf(component.poster), "image")?.url || "" : "";
+        const key = JSON.stringify([source?.url, poster]);
+        if (node.dataset.mediaKey === key) return;
+        node.dataset.mediaKey = key;
+        stopMedia(node);
+        node.replaceChildren();
+        if (source) node.append(createMediaCard({ ...source, title: component.alt || component.title }, {
+          onOpen: onMedia, caption: component.caption, fit: component.fit, poster,
+        }));
+      };
+      bind(node, component.url, update);
+      if (component.poster) bind(node, component.poster, update);
     } else if (kind === "Link") {
       node = element("a", "a2ui-link", component.text);
       node.target = "_blank"; node.rel = "noopener noreferrer";
