@@ -1,9 +1,0 @@
-<div x-data>
-  <div class="right-canvas-surface-panel" data-surface-id="a2ui-zero"
-    :class="{ 'is-active': $store.rightCanvas?.isSurfaceVisible('a2ui-zero'), 'is-mounted': $store.rightCanvas?.isSurfaceRendered('a2ui-zero') }"
-    :aria-hidden="(!$store.rightCanvas?.isSurfaceVisible('a2ui-zero')).toString()">
-    <template x-if="$store.rightCanvas?.isSurfaceVisible('a2ui-zero')">
-      <x-component path="/plugins/a2ui_zero/webui/panel.html"></x-component>
-    </template>
-  </div>
-</div>

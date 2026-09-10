@@ -23,7 +23,7 @@ class Surfaces(ApiHandler):
             return Response(status=400, response="Expected a numeric revision")
         surface = state["surfaces"].get(input.get("surface_id", ""))
         if not surface or surface["revision"] != input.get("revision"):
-            return Response(status=409, response="This view has changed. Use the latest response or reopen it in the canvas.")
+            return Response(status=409, response="This view has changed. Use the latest response in chat.")
         try:
             message = action_message(surface, input.get("component_id", ""), input.get("values", {}))
         except (ValueError, TypeError) as exc:

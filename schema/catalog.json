@@ -852,39 +852,6 @@
       ],
       "additionalProperties": false
     },
-    "CanvasPanel": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "allOf": [
-            {
-              "$ref": "common_types.json#/$defs/ComponentId"
-            },
-            {
-              "pattern": "^[a-zA-Z0-9_-]{1,48}$"
-            }
-          ]
-        },
-        "component": {
-          "const": "CanvasPanel"
-        },
-        "label": {
-          "type": "string",
-          "maxLength": 4000
-        },
-        "surfaceId": {
-          "type": "string",
-          "pattern": "^[a-zA-Z0-9_-]{1,48}$"
-        }
-      },
-      "required": [
-        "id",
-        "component",
-        "label",
-        "surfaceId"
-      ],
-      "additionalProperties": false
-    },
     "anyComponent": {
       "oneOf": [
         {
@@ -931,9 +898,6 @@
         },
         {
           "$ref": "#/$defs/Slider"
-        },
-        {
-          "$ref": "#/$defs/CanvasPanel"
         },
         {
           "$ref": "#/$defs/Audio"

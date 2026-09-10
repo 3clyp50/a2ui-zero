@@ -1,7 +1,6 @@
 import { createStore } from "/js/AlpineStore.js";
 import { callJsonApi } from "/js/api.js";
 import { store as chats } from "/components/sidebar/chats/chats-store.js";
-import { open as openSurface } from "/js/surfaces.js";
 import { toastFrontendError } from "/components/notifications/notification-store.js";
 import { renderSurface, forgetDrafts } from "./renderer.js";
 import { createMediaCard, previewAttachments, stopMedia } from "./media.js";
@@ -10,7 +9,6 @@ import { openModal, closeModal } from "/js/modals.js";
 
 const endpoint = "/plugins/a2ui_zero/surfaces";
 const sending = new Set();
-const autoOpened = new Set();
 let loading = null;
 const mediaModal = "/plugins/a2ui_zero/webui/media-viewer.html";
 if (!document.querySelector('link[data-a2ui-zero]')) {
@@ -20,15 +18,14 @@ if (!document.querySelector('link[data-a2ui-zero]')) {
 }
 
 export const store = createStore("a2uiZero", {
-  contextId: "", surfaces: {}, revision: 0, selectedId: "", activeMedia: null,
-  get list() { return Object.values(this.surfaces); },
+  contextId: "", surfaces: {}, revision: 0, activeMedia: null,
 
   async setContext(contextId) {
     if (contextId === this.contextId) return loading;
     if (this.activeMedia) void closeModal(mediaModal);
     for (const card of document.querySelectorAll(".a2ui-media")) stopMedia(card);
     this.contextId = contextId || "";
-    this.surfaces = {}; this.revision = 0; this.selectedId = "";
+    this.surfaces = {}; this.revision = 0;
     forgetDrafts(this.contextId);
     loading = contextId ? this.refresh() : null;
     return loading;
@@ -41,7 +38,6 @@ export const store = createStore("a2uiZero", {
       const result = await callJsonApi(endpoint, { context_id: contextId });
       if (contextId !== this.contextId || result.revision < this.revision) return;
       this.surfaces = result.surfaces; this.revision = result.revision;
-      if (!this.surfaces[this.selectedId]) this.selectedId = this.list.at(-1)?.id || "";
     } catch (error) { toastFrontendError(error.message, "a2ui-zero"); }
   },
 
@@ -50,19 +46,6 @@ export const store = createStore("a2uiZero", {
     const surfaces = { ...this.surfaces, ...payload.surfaces };
     for (const id of payload.deleted || []) delete surfaces[id];
     this.surfaces = surfaces; this.revision = payload.revision;
-    if (!surfaces[this.selectedId]) this.selectedId = this.list.at(-1)?.id || "";
-  },
-
-  async open(id, contextId = chats.selected) {
-    if (!contextId || contextId !== chats.selected) return;
-    await this.setContext(contextId);
-    await this.refresh();
-    if (contextId !== chats.selected) return;
-    if (id && !this.surfaces[id]) {
-      toastFrontendError("This view is no longer available.", "a2ui-zero"); return;
-    }
-    this.selectedId = id || this.selectedId || this.list.at(-1)?.id || "";
-    await openSurface("a2ui-zero", { surfaceId: this.selectedId });
   },
 
   async act(contextId, surface, componentId, values) {
@@ -81,10 +64,8 @@ export const store = createStore("a2uiZero", {
     finally { sending.delete(key); }
   },
 
-  render(surface, contextId, canvas = false) {
+  render(surface, contextId) {
     return renderSurface(surface, contextId, {
-      canvas,
-      onOpen: id => this.open(id, contextId),
       onAction: (current, componentId, values) => this.act(contextId, current, componentId, values),
       onMedia: source => this.openMedia(source),
     });
@@ -102,16 +83,6 @@ export const store = createStore("a2uiZero", {
     stopMedia(element);
     element.replaceChildren();
     if (this.activeMedia) element.append(createMediaCard(this.activeMedia, { expanded: true }));
-  },
-
-  renderPanel(element) {
-    const surface = this.surfaces[this.selectedId];
-    const key = `${this.contextId}:${surface?.id || ""}:${surface?.revision || 0}`;
-    if (element.dataset.renderKey === key) return;
-    element.dataset.renderKey = key;
-    stopMedia(element);
-    element.replaceChildren();
-    if (surface) element.append(this.render(surface, this.contextId, true));
   },
 
   async afterMessages(batch) {
@@ -133,21 +104,7 @@ export const store = createStore("a2uiZero", {
       stopMedia(rich);
       rich.replaceChildren();
       for (const surface of Object.values(payload.surfaces || {})) {
-        if (surface.placement === "canvas") {
-          const button = document.createElement("button");
-          button.type = "button"; button.className = "button"; button.textContent = `Open ${surface.title} in canvas`;
-          button.addEventListener("click", () => this.open(surface.id, payload.context_id));
-          rich.append(button);
-        } else rich.append(this.render(surface, payload.context_id));
-      }
-      const timestamp = Number(entry.args.timestamp) * 1000;
-      const openKey = `${payload.context_id}:${payload.revision}`;
-      if (payload.open_in_canvas && !batch.massRender && !batch.windowRebuild &&
-          timestamp > Date.now() - 30000 && !autoOpened.has(openKey)) {
-        autoOpened.add(openKey);
-        while (autoOpened.size > 128) autoOpened.delete(autoOpened.values().next().value);
-        const id = Object.keys(payload.surfaces || {}).at(-1);
-        if (id) void this.open(id, payload.context_id);
+        rich.append(this.render(surface, payload.context_id));
       }
     }
     for (const view of batch.history?.querySelectorAll(".a2ui-surface") || []) {
@@ -158,7 +115,6 @@ export const store = createStore("a2uiZero", {
       version.hidden = false;
       version.textContent = latest ? "Earlier version" : "Removed";
       view.querySelectorAll(".a2ui-tree .a2ui-button, input, textarea").forEach(control => { control.disabled = true; });
-      if (!latest) view.querySelector(".a2ui-heading button")?.setAttribute("disabled", "");
     }
   },
 });

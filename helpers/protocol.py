@@ -238,11 +238,9 @@ def visible_components(surface):
     return found
 
 
-def apply_messages(state, messages, title="", placement="chat"):
+def apply_messages(state, messages, title=""):
     if not isinstance(messages, list) or not 1 <= len(messages) <= 64:
         raise ValueError("messages must contain 1–64 A2UI envelopes")
-    if placement not in ("chat", "canvas"):
-        raise ValueError("placement must be chat or canvas")
     if not isinstance(title, str) or len(title) > 120:
         raise ValueError("title must be at most 120 characters")
     bounded(messages)
@@ -273,7 +271,7 @@ def apply_messages(state, messages, title="", placement="chat"):
             if sid in surfaces:
                 raise ValueError("Surface already exists; update it or delete before recreating")
             surfaces[sid] = {"id": sid, "components": {}, "data": {}, "title": title or sid,
-                             "placement": placement, "sendDataModel": payload.get("sendDataModel", False)}
+                             "sendDataModel": payload.get("sendDataModel", False)}
             deleted.discard(sid)
         elif sid not in surfaces:
             raise ValueError("Unknown surface: " + sid)

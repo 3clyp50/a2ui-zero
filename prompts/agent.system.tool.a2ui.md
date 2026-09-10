@@ -2,7 +2,7 @@
 rich chat cards, forms, media; ordinary prose -> response
 args: action show(default)|inspect
 show REQUIRED: text (nonempty fallback), messages
-optional: title, placement chat(default)|canvas, open_in_canvas (only if requested)
+optional: title
 show ends turn; inspect reads current chat UI, keeps turn open
 buttons send visible user messages + form values, never execute/book/pay
 real sources/files; label examples; no secrets, HTML, scripts, CSS, client functions
@@ -30,12 +30,10 @@ catalog (only listed fields; ?optional):
 - ChoicePicker label,value:array,options:[{label,value}]; ?variant mutuallyExclusive/multipleSelection,required
 - DateTimeInput label,value:string; ?enableDate,enableTime,required
 - Slider label,value:number,min,max; ?step
-- CanvasPanel label,surfaceId: opens another surface, no user turn
 
 media: known HTTP(S) URLs or existing /a0/... files; file:///a0/... and img:///a0/... also valid. no base64/invented paths
 inline playback + viewer; ordinary media links also preview. code/text -> Editor
 layout: concise title/caption; no repetition. comparisons/media -> Row of Cards with Column bodies, trailing button/footer for aligned actions; narrow views stack
-current surface already has Open in canvas; never send a message just to open it
 full schema/examples: /a0/usr/plugins/a2ui_zero/schema/catalog.json and examples/
 
 example: bound text + checkbox + submit; actual values go in data

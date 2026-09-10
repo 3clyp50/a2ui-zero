@@ -1,5 +1,41 @@
 # Verification
 
+## Chat-only release (0.3.0)
+
+Verified on **http://localhost:32081**, 2026-09-10 (Europe/Rome), container
+`42eb67c9f635`, using the configured **Cerebras gpt-oss-120b** model.
+
+- Removed the canvas registration, panel and modal wrapper, header launch button,
+  `CanvasPanel` catalog component, and `placement` / `open_in_canvas` tool options.
+  The loaded canvas registry contains only Files, Browser, Desktop, and Editor.
+  Production plugin code and tool instructions contain no canvas routing.
+- Eleven protocol tests pass locally and in the installed framework, including
+  rejection of `CanvasPanel`, absence of new placement metadata, and the retained
+  complete prompt example. Node URL/binding checks and renderer/store syntax pass.
+  The live framework rejects both removed tool arguments with repairable errors.
+- Fresh chat `ZS7xGcFT` rendered image, audio, video, radio choices, a checkbox,
+  notes, and a submit button in chat. The model initially omitted required image
+  `alt` text; validation rejected the call and the next call corrected it. This
+  was a successful repair, not a first-attempt success.
+- Image zoom/pan viewer opened; inline audio played and paused when expanded;
+  expanded audio played; video playback, seeking, expansion, and modal close
+  worked. The media API full/partial/unsatisfiable-range check still passes.
+- Submitted Video, keep-style=true, and notes appeared as one visible user
+  message. The agent acknowledged them. An existing composer draft was preserved.
+- At 390×844, the media/form view fit without horizontal overflow. Comparison
+  buttons retained identical top/bottom positions. Current README screenshots
+  were recaptured without canvas controls using the live renderer.
+- Old chat `vt7QADGJ` replayed four response snapshots, including historical
+  automatic-open requests, with no launch buttons or A2UI canvas entry. A temporary
+  browser-only snapshot with `placement: "canvas"`, `open_in_canvas: true`, and a
+  `CanvasPanel` rendered its saved input in chat and ignored the obsolete control.
+  Saved chat data was not rewritten. Fresh-chat media also survived reload.
+
+The sections below are historical checks for versions 0.1.0–0.2.1. Their canvas
+behavior was removed in 0.3.0; it is not a current capability.
+
+## Initial release baseline (0.1.0)
+
 Target: **http://localhost:32081**, 2026-09-09 (Europe/Rome).
 Container: `42eb67c9f635`, with `/home/eclypso/a0/agent-zero` bind-mounted at `/a0`.
 Plugin runtime: `/a0/usr/plugins/a2ui_zero`.

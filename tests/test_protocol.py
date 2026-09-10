@@ -72,7 +72,9 @@ class ProtocolTests(unittest.TestCase):
             state = apply_example(path.stem)
             self.assertEqual(state, json.loads(json.dumps(state)))
             self.assertEqual(state["revision"], 1)
-            self.assertTrue(next(iter(state["surfaces"].values()))["components"]["root"])
+            surface = next(iter(state["surfaces"].values()))
+            self.assertTrue(surface["components"]["root"])
+            self.assertNotIn("placement", surface)
 
     def test_update_and_delete_are_atomic(self):
         state = apply_example()
@@ -91,6 +93,7 @@ class ProtocolTests(unittest.TestCase):
     def test_schema_rejects_code_remote_catalogs_and_unknown_properties(self):
         args = example()
         for component in [{"id": "root", "component": "Html", "html": "<script>bad()</script>"},
+                          {"id": "root", "component": "CanvasPanel", "surfaceId": "flights", "label": "Open"},
                           {"id": "root", "component": "Text", "text": "x", "onclick": "bad()"}]:
             bad = copy.deepcopy(args["messages"])
             bad[1]["updateComponents"]["components"] = [component]

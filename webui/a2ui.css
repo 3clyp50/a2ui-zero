@@ -1,4 +1,4 @@
-.a2ui-surface, .a2ui-panel {
+.a2ui-surface {
   color: var(--color-text);
   font-family: var(--font-family-main);
   font-size: var(--font-size-normal);
@@ -13,7 +13,7 @@
   background: var(--color-panel);
   overflow: hidden;
 }
-.a2ui-surface *, .a2ui-panel * { box-sizing: border-box; }
+.a2ui-surface * { box-sizing: border-box; }
 .a2ui-heading {
   display: flex;
   align-items: center;
@@ -73,12 +73,7 @@
 .a2ui-checkbox, .a2ui-option { display: flex; flex-direction: row; align-items: center; gap: var(--spacing-sm); padding-block: var(--spacing-xs); }
 .a2ui-checkbox .a2ui-field-label { order: 1; margin: 0; }
 .a2ui-option { min-height: 2.75rem; font-size: var(--font-size-smaller); }
-.a2ui-panel { padding: var(--spacing-md); width: 100%; height: 100%; overflow: auto; background: var(--color-panel); }
-.a2ui-panel .a2ui-surface { margin: 0; }
-.a2ui-panel-toolbar { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
-.a2ui-panel-toolbar select { flex: 1; min-width: 0; font: inherit; padding: var(--spacing-sm); border-radius: var(--border-radius-sm); background: var(--color-input); color: var(--color-text); border: 1px solid var(--color-border); }
-.a2ui-empty { padding: var(--spacing-lg); text-align: center; color: var(--color-text-muted); }
 @media (max-width: 600px) {
-  .a2ui-tree, .a2ui-card, .a2ui-heading, .a2ui-panel { padding: var(--spacing-sm); }
+  .a2ui-tree, .a2ui-card, .a2ui-heading { padding: var(--spacing-sm); }
   .a2ui-row > * { flex-basis: 100%; }
 }

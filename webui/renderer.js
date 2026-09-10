@@ -35,7 +35,7 @@ export function forgetDrafts(contextId) {
   for (const key of drafts.keys()) if (!key.startsWith(`${contextId}:`)) drafts.delete(key);
 }
 
-export function renderSurface(surface, contextId, { onAction, onOpen, onMedia, canvas = false }) {
+export function renderSurface(surface, contextId, { onAction, onMedia }) {
   const draft = draftFor(contextId, surface);
   const root = element("section", "a2ui-surface");
   root.dataset.surfaceId = surface.id;
@@ -47,12 +47,6 @@ export function renderSurface(surface, contextId, { onAction, onOpen, onMedia, c
   const version = element("span", "a2ui-caption a2ui-version");
   version.hidden = true;
   header.append(version);
-  if (!canvas) {
-    const open = element("button", "text-button", "Open in canvas");
-    open.type = "button";
-    open.addEventListener("click", () => onOpen(surface.id));
-    header.append(open);
-  }
   root.append(header);
   const form = element("form", "a2ui-tree");
   form.addEventListener("submit", event => event.preventDefault());
@@ -115,28 +109,22 @@ export function renderSurface(surface, contextId, { onAction, onOpen, onMedia, c
       node = element("x-icon"); node.setAttribute("name", component.name);
     } else if (kind === "Divider") {
       node = element("hr", "a2ui-divider");
-    } else if (kind === "Button" || kind === "CanvasPanel") {
+    } else if (kind === "Button") {
       node = element("button", `button a2ui-button ${component.variant === "primary" ? "a2ui-primary" : ""}`);
       node.type = "button";
-      if (kind === "CanvasPanel") {
-        node.textContent = component.label;
-        node.setAttribute("aria-label", component.label);
-        node.addEventListener("click", () => onOpen(component.surfaceId));
-      } else {
-        const label = surface.components[component.child];
-        bind(node, label?.text ?? "Continue", value => {
-          node.textContent = value ?? "Continue";
-          node.setAttribute("aria-label", node.textContent);
-        });
-        node.title = "Send: " + component.action.event.context.message;
-        node.dataset.bsAnimation = "false";
-        node.addEventListener("click", async () => {
-          if (!form.reportValidity()) return;
-          node.disabled = true;
-          try { await onAction(surface, component.id, { ...draft.edits }); }
-          finally { node.disabled = false; }
-        });
-      }
+      const label = surface.components[component.child];
+      bind(node, label?.text ?? "Continue", value => {
+        node.textContent = value ?? "Continue";
+        node.setAttribute("aria-label", node.textContent);
+      });
+      node.title = "Send: " + component.action.event.context.message;
+      node.dataset.bsAnimation = "false";
+      node.addEventListener("click", async () => {
+        if (!form.reportValidity()) return;
+        node.disabled = true;
+        try { await onAction(surface, component.id, { ...draft.edits }); }
+        finally { node.disabled = false; }
+      });
     } else if (["TextField", "CheckBox", "ChoicePicker", "DateTimeInput", "Slider"].includes(kind)) {
       node = element(kind === "ChoicePicker" ? "fieldset" : "label", "a2ui-field");
       const label = element(kind === "ChoicePicker" ? "legend" : "span", "a2ui-field-label", component.label);
@@ -147,7 +135,7 @@ export function renderSurface(surface, contextId, { onAction, onOpen, onMedia, c
           const wrapper = element("label", "a2ui-option");
           const input = element("input");
           input.type = multiple ? "checkbox" : "radio";
-          input.name = `${contextId}-${surface.id}-${id}-${canvas ? "canvas" : "chat"}`;
+          input.name = `${contextId}-${surface.id}-${id}`;
           input.value = option.value;
           input.required = Boolean(component.required && !multiple);
           bind(input, component.value, value => { input.checked = Array.isArray(value) && value.includes(option.value); });

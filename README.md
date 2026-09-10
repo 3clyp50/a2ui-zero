@@ -1,7 +1,7 @@
 # a2ui-zero
 
 Rich answers that belong in Agent Zero: interactive cards, images, audio, video, comparisons,
-forms, and choices in chat, with room for larger views in the right canvas.
+forms, and choices directly in chat.
 
 ![a2ui-zero](webui/thumbnail.webp)
 
@@ -14,7 +14,7 @@ forms, and choices in chat, with room for larger views in the right canvas.
 - “Give me a visual Kyoto guide with a photograph and choices for what to explore.”
 - “Ask me for a destination, interests, date and daily budget in an interactive
   form, then use my answers to plan a day.”
-- “Keep this comparison open in the canvas while we discuss it.”
+- “Show the generated image, audio, and video together so I can review them.”
 
 The agent uses its existing configured model and research tools. A2UI adds the
 presentation and interaction; it does not supply flight inventory, photos, or
@@ -24,7 +24,7 @@ readable labels and entered values. They do not directly execute agent tools.
 ## Install
 
 Requires an Agent Zero build with community plugins, the `set_messages_after_loop`
-WebUI hook, native canvas surfaces, and its existing `jsonschema` dependency.
+WebUI hook, and its existing `jsonschema` dependency.
 Install [this repository](https://github.com/3clyp50/a2ui-zero) through
 **Plugins → Add plugin** using its URL, or upload a plugin ZIP. Refresh the WebUI
 and start a new chat so the agent receives the tool instructions. There are no
@@ -46,11 +46,7 @@ agent-provided URL. Its schema is in [schema/catalog.json](schema/catalog.json).
 | Media | Audio, Video |
 | Choices | Button, ChoicePicker |
 | Forms | TextField, CheckBox, DateTimeInput, Slider |
-| Workspace | CanvasPanel |
 
-`CanvasPanel` opens another named UI surface in Agent Zero's native canvas.
-Every inline surface also offers **Open in canvas**. The canvas has a view
-selector and uses the host's docking, floating-window and mobile controls.
 Colors, typography, spacing, borders, focus rings and controls inherit Agent
 Zero's design tokens, including light mode.
 
@@ -72,7 +68,7 @@ submit them together. Conditional fields require an agent update; choosing
 Images, audio, and video play directly in rich chat cards, including files created
 by generation tools. Image cards open Agent Zero's existing zoom/pan viewer.
 Audio and video use native playback controls and can expand in the native modal
-shell. The same A2UI components also work in the right canvas.
+shell.
 
 Ordinary assistant replies containing media file links receive inline preview
 cards automatically, without another model call. Existing Markdown images keep
@@ -103,8 +99,7 @@ external player, autoplay, HTML, PDF, or code preview is added.
 ## Agent tool
 
 `a2ui` accepts `action: "show"`, a plain-text fallback `text`, and `messages`.
-Optional arguments: `title`, `placement: "chat" | "canvas"`, and
-`open_in_canvas: true`. `show` completes the turn. `action: "inspect"` reads this
+Optional argument: `title`. `show` completes the turn. `action: "inspect"` reads this
 chat's current surface state without ending the turn.
 
 Supported messages: `createSurface`, `updateComponents`, `updateDataModel`, and
@@ -126,11 +121,11 @@ are preserved; a choice never moves to a different chat.
 ## Persistence and boundaries
 
 - Current surfaces live in Agent Zero's persisted chat context; response logs
-  retain snapshots for history replay and exported chats. The canvas shows the
-  latest state. Older chat responses remain historical snapshots; stale choices
+  retain snapshots for history replay and exported chats. Older chat responses
+  remain historical snapshots; stale choices
   are rejected. Deletion removes the current surface, preserving the transcript.
-- Local form edits are shared between chat and canvas while mounted. They are
-  discarded on a new server revision, chat switch or page reload. Submit them
+- Local form edits stay in the current chat while mounted. They are discarded
+  on a new server revision, chat switch or page reload. Submit them
   before leaving if the agent should remember them.
 - Form values enter ordinary chat messages. There is no password/secret input
   component or private credential handoff to terminal tools; do not use these
@@ -151,6 +146,11 @@ are preserved; a choice never moves to a different chat.
 - Disable/remove through Plugins. Hooks create no external files or processes and
   never alter shared dependencies. Saved chat snapshots remain; the readable
   fallback continues to work without this plugin.
+
+Since 0.3.0, all A2UI views appear in chat. There is no canvas panel or launch
+control. Older saved views also render in chat; their obsolete canvas controls
+are ignored. The removed `CanvasPanel`, `placement`, and `open_in_canvas` options
+are rejected in new tool calls.
 
 ## Development
 
